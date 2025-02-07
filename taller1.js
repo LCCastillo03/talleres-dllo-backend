@@ -35,9 +35,7 @@ function peorParidad(n) {
     }
     return "Número fuera de rango"
 }
-console.log(peorParidad(5))
-console.log(mejorParidad(10))
-console.log(convertidorTemp(10))
+
 
 
 
