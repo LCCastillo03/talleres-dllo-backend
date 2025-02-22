@@ -27,7 +27,7 @@ function sum(array) {
 }
 
 function missingNumbers(numeros) {
-    if (numeros.length === 0) return []; 
+    if (numeros.length === 0) return []
   
     let min = numeros[0], max = numeros[0];
     for (let i = 1; i < numeros.length; i++) {
@@ -37,23 +37,21 @@ function missingNumbers(numeros) {
   
     let existentes = {};
     for (let i = 0; i < numeros.length; i++) {
-      existentes[numeros[i]] = true;
+      existentes[numeros[i]] = true
     }
   
     let faltantes = [];
     for (let i = min; i <= max; i++) {
       if (!existentes[i]) { 
-        faltantes.push(i);
+        faltantes.push(i)
       }
     }
   
-    return faltantes;
+    return faltantes
   }
 
-
-
 console.log(findMax([3,17,-1,4,-19])); // 17
-console.log(includes([3,17,-1,4,-19], 4)); // tru
+console.log(includes([3,17,-1,4,-19], 4)); // true
 console.log(sum([3,17,-1,4,-19])); // 4
 console.log(missingNumbers([7,2,4,6,3,9])); // [5, 8]
   
