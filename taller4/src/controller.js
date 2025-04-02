@@ -29,7 +29,11 @@ const getUsersByHobby = (req, res) => {
         const filteredUsers = users
             .filter(user => user.hobbies.includes(hobby))
             .map(user => ({ nombre: `${user.nombre} ${user.apellido}`, hobbies: user.hobbies }));
-        res.json(filteredUsers);
+
+         if (filteredUsers.length === 0) {
+            return res.status(404).json({ message: "Este hobby no tiene usuarios" });
+            }
+        res.json(filteredUsers); 
     }, res);
 };
 
