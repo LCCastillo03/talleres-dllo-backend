@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const filePath = path.resolve(__dirname, "24-taller-04-datos.json");
+const filePath = path.resolve(__dirname, "../24-taller-04-datos.json");
 
 const readUsersFile = (callback, res) => {
     fs.readFile(filePath, "utf8", (err, data) => {
@@ -64,7 +64,7 @@ const getUsersHobbyCount = (req, res) => {
 };
 
 
-const getIsFree = (res) => {
+const getIsFree = (req, res) => {
     readUsersFile((users, res) => {  
         const freeUsers = users.filter(user => user.hobbies.length < 3).map(user => ({ nombre: `${user.nombre} ${user.apellido}`, hobbies: user.hobbies }));
         res.json(freeUsers);

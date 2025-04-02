@@ -365,5 +365,23 @@
       "carnavalear",
       "ir a cine"
     ]
+  },
+  {
+    "codigo": "200123456",
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "hobbies": [
+      "fútbol",
+      "videojuegos"
+    ]
+  },
+  {
+    "codigo": "200123450",
+    "nombre": "Orlando",
+    "apellido": "Arroyo",
+    "hobbies": [
+      "fútbol",
+      "videojuegos"
+    ]
   }
 ]
