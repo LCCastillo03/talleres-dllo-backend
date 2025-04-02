@@ -114,23 +114,19 @@ const suggestHobby = (req, res) => {
 const createUser = (req, res) => {
     const { codigo, nombre, apellido, hobbies } = req.body;
     
-    // Validación de datos
     if (!codigo || !nombre || !apellido || !hobbies) {
         return res.status(400).json({ error: "Todos los campos son obligatorios: codigo, nombre, apellido y hobbies" });
     }
     
-    // Validar que hobbies sea un array con al menos 2 elementos
     if (!Array.isArray(hobbies) || hobbies.length < 2) {
         return res.status(400).json({ error: "Debe incluir al menos dos hobbies" });
     }
     
     readUsersFile((users) => {
-        // Verificar si el código ya existe
         if (users.some(user => user.codigo === codigo)) {
             return res.status(409).json({ error: "Ya existe un usuario con ese código" });
         }
         
-        // Crear el nuevo usuario
         const newUser = {
             codigo,
             nombre,
@@ -138,10 +134,8 @@ const createUser = (req, res) => {
             hobbies
         };
         
-        // Agregar el usuario al array
         users.push(newUser);
         
-        // Guardar en el archivo
         fs.writeFile(filePath, JSON.stringify(users, null, 2), (writeErr) => {
             if (writeErr) {
                 return res.status(500).json({ error: "Error al actualizar el archivo JSON." });
