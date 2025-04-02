@@ -384,5 +384,14 @@
       "videojuegos",
       "Monopoly"
     ]
+  },
+  {
+    "codigo": "20011111",
+    "nombre": "Xaden",
+    "apellido": "Riorson",
+    "hobbies": [
+      "Equitación",
+      "videojuegos"
+    ]
   }
 ]
