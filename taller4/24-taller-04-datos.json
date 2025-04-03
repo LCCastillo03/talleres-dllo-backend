@@ -393,5 +393,14 @@
       "Equitación",
       "videojuegos"
     ]
+  },
+  {
+    "codigo": "20066769",
+    "nombre": "Gabriela",
+    "apellido": "Bula",
+    "hobbies": [
+      "fútbol",
+      "videojuegos"
+    ]
   }
 ]
