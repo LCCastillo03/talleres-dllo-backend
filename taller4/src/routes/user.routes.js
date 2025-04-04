@@ -6,7 +6,7 @@ const {
   getIsFree,
   suggestHobby,
   createUser
-} =require("./controller");
+} =require("../controller/user.controller");
 
 // INIT ROUTES
 const router = express.Router();
