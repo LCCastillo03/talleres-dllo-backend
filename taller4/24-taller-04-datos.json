@@ -412,5 +412,14 @@
       "Cocinar",
       "Monopoly"
     ]
+  },
+  {
+    "codigo": "200100456",
+    "nombre": "Jose María",
+    "apellido": "Calvo",
+    "hobbies": [
+      "fútbol",
+      "videojuegos"
+    ]
   }
 ]
