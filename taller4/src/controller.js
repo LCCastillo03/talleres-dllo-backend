@@ -1,8 +1,9 @@
-const filterUsersByField = require("../actions/filterUsersByField.action");
-const filterUsersByFieldIncludes = require("../actions/filterUsersByFieldIncludes.action");
-const checkUserExists = require("../actions/checkUserExists.action");
-const createUserAction = require("../actions/createUser.action");
-const { readUsersFile, writeUsersFile } = require("../services/dataService");
+const filterUsersByField = require("./actions/filterUsersByField.action");
+const filterUsersByFieldIncludes = require("./actions/filterUsersByFieldIncludes.action");
+const checkUserExists = require("./actions/checkUserExists.action");
+const createUserAction = require("./actions/createUser.action");
+const { readUsersFile, writeUsersFile } = require("./services/dataService");
+
 
 async function getUsersByHobby(req, res) {
   const { hobby } = req.query;
