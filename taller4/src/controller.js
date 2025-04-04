@@ -1,156 +1,80 @@
-const fs = require("fs");
-const path = require("path");
+const filterUsersByField = require("../actions/filterUsersByField.action");
+const filterUsersByFieldIncludes = require("../actions/filterUsersByFieldIncludes.action");
+const checkUserExists = require("../actions/checkUserExists.action");
+const createUserAction = require("../actions/createUser.action");
+const { readUsersFile, writeUsersFile } = require("../services/dataService");
 
-const filePath = path.resolve(__dirname, "../24-taller-04-datos.json");
+async function getUsersByHobby(req, res) {
+  const { hobby } = req.query;
+  if (!hobby) return res.status(400).json({ error: "Debes enviar un hobby" });
 
-const readUsersFile = (callback, res) => {
-    fs.readFile(filePath, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: "Error al leer el archivo JSON" });
-        }
+  const users = await filterUsersByFieldIncludes("hobbies", hobby);
+  if (users.length === 0) return res.status(404).json({ message: "Este hobby no tiene usuarios" });
+  res.json(users);
+}
 
-        try {
-            const users = JSON.parse(data);
-            callback(users, res); 
-        } catch (parseError) {
-            return res.status(500).json({ error: "Error al parsear el JSON" });
-        }
-    });
+async function getUsersExists(req, res) {
+  const { codigo } = req.query;
+  if (!codigo) return res.status(400).json({ error: "Debes enviar un código" });
+
+  const exists = await checkUserExists(codigo);
+  res.json({ message: exists ? `Usuario con código ${codigo} existe` : "Usuario no encontrado" });
+}
+
+async function getUsersHobbyCount(req, res) {
+  const { hobby } = req.query;
+  if (!hobby) return res.status(400).json({ error: "Debes enviar un hobby" });
+
+  const users = await filterUsersByFieldIncludes("hobbies", hobby);
+  res.json({ hobby, cantidad: users.length });
+}
+
+async function getIsFree(req, res) {
+  const users = await readUsersFile();
+  const result = users
+    .filter(u => u.hobbies.length < 3)
+    .map(u => ({ nombre: `${u.nombre} ${u.apellido}`, hobbies: u.hobbies }));
+  res.json(result);
+}
+
+async function suggestHobby(req, res) {
+  const { codigo, hobby } = req.body;
+  if (!codigo || !hobby) return res.status(400).json({ error: "Debes enviar un código y un hobby" });
+
+  const users = await readUsersFile();
+  const user = users.find(u => u.codigo === codigo);
+
+  if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (user.hobbies.length >= 3) {
+    return res.json({ message: `El usuario ${user.nombre} ${user.apellido} ya tiene 3 hobbies` });
+  }
+
+  user.hobbies.push(hobby);
+  await writeUsersFile(users);
+
+  res.json({ message: `Hobby agregado a ${user.nombre} ${user.apellido}`, usuario: user });
+}
+
+async function createUser(req, res) {
+  const { codigo, nombre, apellido, hobbies } = req.body;
+
+  if (!codigo || !nombre || !apellido || !hobbies || hobbies.length < 2) {
+    return res.status(400).json({ error: "Campos obligatorios: codigo, nombre, apellido y mínimo 2 hobbies" });
+  }
+
+  try {
+    const user = await createUserAction({ codigo, nombre, apellido, hobbies });
+    res.status(201).json({ message: "Usuario creado", usuario: user });
+  } catch (err) {
+    res.status(409).json({ error: err.message });
+  }
+}
+
+module.exports = {
+  getUsersByHobby,
+  getUsersExists,
+  getUsersHobbyCount,
+  getIsFree,
+  suggestHobby,
+  createUser
 };
-
-
-const getUsersByHobby = (req, res) => {
-    const hobby = req.query.hobby;
-    if (!hobby) {
-        return res.status(400).json({ error: "Debes enviar un hobby" });
-    }
-
-    readUsersFile(users => {
-        const filteredUsers = users
-            .filter(user => user.hobbies.includes(hobby))
-            .map(user => ({ nombre: `${user.nombre} ${user.apellido}`, hobbies: user.hobbies }));
-
-         if (filteredUsers.length === 0) {
-            return res.status(404).json({ message: "Este hobby no tiene usuarios" });
-            }
-        res.json(filteredUsers); 
-    }, res);
-};
-
-
-const getUsersExists = (req, res) => {
-    const codigo = req.query.codigo;
-    if (!codigo) {
-        return res.status(400).json({ error: "Debes enviar un código" });
-    }
-
-    readUsersFile(users => {
-        const user = users.find(user => user.codigo === codigo);
-        
-        if (user) {
-            res.json({ message: `Usuario ${user.nombre} ${user.apellido} existe` });
-        } else {
-            res.json({ message: "Usuario no encontrado" });
-        }
-    }, res);
-};
-
-const getUsersHobbyCount = (req, res) => {
-    const hobby = req.query.hobby;
-    if (!hobby) {
-        return res.status(400).json({ error: "Debes enviar un hobby" });
-    }
-
-    readUsersFile(users => {
-        const count = users.filter(user => user.hobbies.includes(hobby)).length;
-        res.json({ hobby, cantidad: count });
-    }, res);
-};
-
-
-const getIsFree = (req, res) => {
-    readUsersFile((users, res) => {  
-        const freeUsers = users.filter(user => user.hobbies.length < 3).map(user => ({ nombre: `${user.nombre} ${user.apellido}`, hobbies: user.hobbies }));
-        res.json(freeUsers);
-    }, res);
-};
-
-
-
-const suggestHobby = (req, res) => {
-    const { codigo, hobby } = req.body;
-
-    if (!codigo || !hobby) {
-        return res.status(400).json({ error: "Debes enviar un código y un hobby." });
-    }
-
-    readUsersFile((users, res) => {
-        const userIndex = users.findIndex(user => user.codigo === codigo);
-
-        if (userIndex === -1) {
-            return res.status(404).json({ error: "Usuario no encontrado." });
-        }
-
-        const user = users[userIndex];
-
-        if (!Array.isArray(user.hobbies)) {
-            user.hobbies = [];
-        }
-
-        if (user.hobbies.length >= 3) {
-            return res.json({ 
-                message: `El usuario ${user.nombre} ${user.apellido} ya tiene 3 hobbies, no se puede agregar más.` 
-            });
-        }
-
-        user.hobbies.push(hobby);
-
-        fs.writeFile(filePath, JSON.stringify(users, null, 2), (writeErr) => {
-            if (writeErr) {
-                return res.status(500).json({ error: "Error al actualizar el archivo JSON." });
-            }
-            res.json({ message: `Hobby agregado a ${user.nombre} ${user.apellido}.`, usuario: user });
-        });
-    }, res);
-};
-
-
-const createUser = (req, res) => {
-    const { codigo, nombre, apellido, hobbies } = req.body;
-    
-    if (!codigo || !nombre || !apellido || !hobbies) {
-        return res.status(400).json({ error: "Todos los campos son obligatorios: codigo, nombre, apellido y hobbies" });
-    }
-    
-    if (!Array.isArray(hobbies) || hobbies.length < 2) {
-        return res.status(400).json({ error: "Debe incluir al menos dos hobbies" });
-    }
-    
-    readUsersFile((users) => {
-        if (users.some(user => user.codigo === codigo)) {
-            return res.status(409).json({ error: "Ya existe un usuario con ese código" });
-        }
-        
-        const newUser = {
-            codigo,
-            nombre,
-            apellido,
-            hobbies
-        };
-        
-        users.push(newUser);
-        
-        fs.writeFile(filePath, JSON.stringify(users, null, 2), (writeErr) => {
-            if (writeErr) {
-                return res.status(500).json({ error: "Error al actualizar el archivo JSON." });
-            }
-            res.status(201).json({ 
-                message: "Usuario registrado exitosamente", 
-                usuario: newUser 
-            });
-        });
-    }, res);
-};
-
-
-module.exports = { getUsersByHobby, getUsersExists, getUsersHobbyCount, getIsFree, suggestHobby, createUser };

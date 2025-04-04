@@ -402,5 +402,15 @@
       "fútbol",
       "videojuegos"
     ]
+  },
+  {
+    "codigo": "2001234000",
+    "nombre": "Camila",
+    "apellido": "Rodriguez",
+    "hobbies": [
+      "Lectura",
+      "Cocinar",
+      "Monopoly"
+    ]
   }
 ]
