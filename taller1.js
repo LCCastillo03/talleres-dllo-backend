@@ -33,8 +33,9 @@ function peorParidad(n) {
     while (intentos < 1000000000) {
         intentos++;
     }
-    return "Número fuera de rango"
+    return "Número fuera de rango, intente de nuevo.";
 }
+//prueba
 
 
 
